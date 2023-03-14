@@ -23,8 +23,8 @@ import { extractDateParts, parseDate as _parseDate } from '@vaadin/date-picker/s
             // Check whether the locale is supported or not
             new Date().toLocaleDateString(locale);
           } catch (e) {
-            console.warn('The locale is not supported, using default locale setting(en-US).');
-            return 'M/d/yyyy';
+            console.warn('The locale is not supported, using default format setting (ISO 8601).');
+            return 'yyyy-MM-dd';
           }
 
           // format test date and convert to date-fns pattern
@@ -43,8 +43,8 @@ import { extractDateParts, parseDate as _parseDate } from '@vaadin/date-picker/s
             .replace('1234', 'yyyy');
           const isValidPattern = pattern.includes('d') && pattern.includes('M') && pattern.includes('y');
           if (!isValidPattern) {
-            console.warn('The locale is not supported, using default locale setting(en-US).');
-            return 'M/d/yyyy';
+            console.warn('The locale is not supported, using default format setting (ISO 8601).');
+            return 'yyyy-MM-dd';
           }
 
           return pattern;
@@ -139,7 +139,7 @@ import { extractDateParts, parseDate as _parseDate } from '@vaadin/date-picker/s
 
         function _getReferenceDate() {
           const { referenceDate } = datepicker.i18n;
-          return referenceDate ? new Date(referenceDate.year, referenceDate.month - 1, referenceDate.day) : new Date();
+          return referenceDate ? new Date(referenceDate.year, referenceDate.month, referenceDate.day) : new Date();
         }
 
         datepicker.$connector.updateI18n = tryCatchWrapper(function (locale, i18n) {
@@ -152,10 +152,7 @@ import { extractDateParts, parseDate as _parseDate } from '@vaadin/date-picker/s
           const formatterAndParser = createFormatterAndParser(usedFormats);
 
           // Merge current web component I18N settings with new I18N settings and the formatting and parsing functions
-          // Defer setting I18N property into microtask as a workaround for: https://github.com/vaadin/flow-components/issues/4500
-          queueMicrotask(() => {
-            datepicker.i18n = Object.assign({}, datepicker.i18n, i18n, formatterAndParser);
-          });
+          datepicker.i18n = Object.assign({}, datepicker.i18n, i18n, formatterAndParser);
         });
       })(datepicker)
   };

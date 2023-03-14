@@ -460,7 +460,7 @@ import { isFocusable } from '@vaadin/grid/src/vaadin-grid-active-item-mixin.js';
                 // order for the sort indicators to match the order on the server. For "append"
                 // just keep the order passed from the server.
                 if (grid.multiSortPriority !== 'append') {
-                  directions = directions.reverse()
+                  directions = directions.reverse();
                 }
                 directions.forEach(({ column, direction }) => {
                   sorters.forEach((sorter) => {
@@ -676,9 +676,7 @@ import { isFocusable } from '@vaadin/grid/src/vaadin-grid-active-item-mixin.js';
             cache[pkey][page] = slice;
 
             grid.$connector.doSelection(slice.filter((item) => item.selected));
-            grid.$connector.doDeselection(
-              slice.filter((item) => !item.selected && selectedKeys[item.key])
-            );
+            grid.$connector.doDeselection(slice.filter((item) => !item.selected && selectedKeys[item.key]));
 
             const updatedItems = updateGridCache(page, pkey);
             if (updatedItems) {
@@ -785,6 +783,7 @@ import { isFocusable } from '@vaadin/grid/src/vaadin-grid-active-item-mixin.js';
             let page = firstPage + i;
             let items = cache[pkey][page];
             grid.$connector.doDeselection(items.filter((item) => selectedKeys[item.key]));
+            items.forEach((item) => grid.closeItemDetails(item));
             delete cache[pkey][page];
             const updatedItems = updateGridCache(page, parentKey);
             if (updatedItems) {
@@ -808,6 +807,7 @@ import { isFocusable } from '@vaadin/grid/src/vaadin-grid-active-item-mixin.js';
             }
           }
           grid._cache.updateSize();
+          grid._effectiveSize = grid._cache.effectiveSize;
         });
 
         grid.$connector.reset = tryCatchWrapper(function () {
@@ -1001,34 +1001,68 @@ import { isFocusable } from '@vaadin/grid/src/vaadin-grid-active-item-mixin.js';
         // Have the multi-selectable state updated on attach
         grid._createPropertyObserver('isAttached', () => grid.$connector.updateMultiSelectable());
 
-        // TODO: should be removed once https://github.com/vaadin/vaadin-grid/issues/1471 gets implemented
-        grid.$connector.setVerticalScrollingEnabled = tryCatchWrapper(function (enabled) {
-          // There are two scollable containers in grid so apply the changes for both
-          setVerticalScrollingEnabled(grid.$.table, enabled);
+        const singleTimeRenderer = (renderer) => {
+          return (root) => {
+            if (renderer) {
+              renderer(root);
+              renderer = null;
+            }
+          };
+        };
+
+        grid.$connector.setHeaderRenderer = tryCatchWrapper(function (column, options) {
+          const { content, showSorter, sorterPath } = options;
+
+          if (content === null) {
+            column.headerRenderer = null;
+            return;
+          }
+
+          column.headerRenderer = singleTimeRenderer((root) => {
+            // Clear previous contents
+            root.innerHTML = '';
+            // Render sorter
+            let contentRoot = root;
+            if (showSorter) {
+              const sorter = document.createElement('vaadin-grid-sorter');
+              sorter.setAttribute('path', sorterPath);
+              const ariaLabel = content instanceof Node ? content.textContent : content;
+              if (ariaLabel) {
+                sorter.setAttribute('aria-label', `Sort by ${ariaLabel}`);
+              }
+              root.appendChild(sorter);
+
+              // Use sorter as content root
+              contentRoot = sorter;
+            }
+            // Add content
+            if (content instanceof Node) {
+              contentRoot.appendChild(content);
+            } else {
+              contentRoot.textContent = content;
+            }
+          });
         });
 
-        const setVerticalScrollingEnabled = function (scrollable, enabled) {
-          // Prevent Y axis scrolling with CSS. This will hide the vertical scrollbar.
-          scrollable.style.overflowY = enabled ? '' : 'hidden';
-          // Clean up an existing listener
-          scrollable.removeEventListener('wheel', scrollable.__wheelListener);
-          // Add a wheel event listener with the horizontal scrolling prevention logic
-          !enabled &&
-            scrollable.addEventListener(
-              'wheel',
-              (scrollable.__wheelListener = tryCatchWrapper((e) => {
-                if (e.deltaX) {
-                  // If there was some horizontal delta related to the wheel event, force the vertical
-                  // delta to 0 and let grid process the wheel event normally
-                  Object.defineProperty(e, 'deltaY', { value: 0 });
-                } else {
-                  // If there was verical delta only, skip the grid's wheel event processing to
-                  // enable scrolling the page even if grid isn't scrolled to end
-                  e.stopImmediatePropagation();
-                }
-              }))
-            );
-        };
+        grid.$connector.setFooterRenderer = tryCatchWrapper(function (column, options) {
+          const { content } = options;
+
+          if (content === null) {
+            column.footerRenderer = null;
+            return;
+          }
+
+          column.footerRenderer = singleTimeRenderer((root) => {
+            // Clear previous contents
+            root.innerHTML = '';
+            // Add content
+            if (content instanceof Node) {
+              root.appendChild(content);
+            } else {
+              root.textContent = content;
+            }
+          });
+        });
 
         grid.addEventListener(
           'vaadin-context-menu-before-open',
@@ -1125,12 +1159,13 @@ import { isFocusable } from '@vaadin/grid/src/vaadin-grid-active-item-mixin.js';
           }
 
           const target = event.target;
-          const eventContext = grid.getEventContext(event);
-          const section = eventContext.section;
 
           if (isFocusable(target) || target instanceof HTMLLabelElement) {
             return;
           }
+
+          const eventContext = grid.getEventContext(event);
+          const section = eventContext.section;
 
           if (eventContext.item && section !== 'details') {
             event.itemKey = eventContext.item.key;
@@ -1148,6 +1183,15 @@ import { isFocusable } from '@vaadin/grid/src/vaadin-grid-active-item-mixin.js';
             return;
           }
           return (style.row || '') + ' ' + ((column && style[column._flowId]) || '');
+        });
+
+
+        grid.cellPartNameGenerator = tryCatchWrapper(function (column, rowData) {
+          const part = rowData.item.part;
+          if (!part) {
+            return;
+          }
+          return (part.row || '') + ' ' + ((column && part[column._flowId]) || '');
         });
 
         grid.dropFilter = tryCatchWrapper((rowData) => !rowData.item.dropDisabled);
