@@ -2,7 +2,6 @@
   "name": "no-name",
   "license": "UNLICENSED",
   "dependencies": {
-    "@polymer/iron-icon": "3.0.1",
     "@polymer/polymer": "3.5.1",
     "@vaadin/accordion": "24.0.0",
     "@vaadin/app-layout": "24.0.0",
@@ -95,7 +94,6 @@
   },
   "vaadin": {
     "dependencies": {
-      "@polymer/iron-icon": "3.0.1",
       "@polymer/polymer": "3.5.1",
       "@vaadin/accordion": "24.0.0",
       "@vaadin/app-layout": "24.0.0",
@@ -186,7 +184,7 @@
       "workbox-core": "6.5.4",
       "workbox-precaching": "6.5.4"
     },
-    "hash": "77625d166738b5e6791bbdae2136f1086790e8e717cecef4391c6e0aca337e71"
+    "hash": "6d22a7a18ac45a8f027a9d08e22dea880b735a66b4e97f1d4a2f5657119f4833"
   },
   "overrides": {
     "@vaadin/bundles": "$@vaadin/bundles",
@@ -261,7 +259,6 @@
     "@polymer/polymer": "$@polymer/polymer",
     "proj4": "$proj4",
     "date-fns": "$date-fns",
-    "@vaadin/overlay": "$@vaadin/overlay",
-    "@polymer/iron-icon": "$@polymer/iron-icon"
+    "@vaadin/overlay": "$@vaadin/overlay"
   }
 }
