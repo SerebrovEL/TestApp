@@ -62,6 +62,11 @@
             <version>${vaadin.version}</version>
         </dependency>
         <dependency>
+            <groupId>com.vaadin.componentfactory</groupId>
+            <artifactId>explorer-tree-grid-flow</artifactId>
+            <version>${vaadin.version}</version>
+        </dependency>
+        <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-simple</artifactId>
             <version>${slf4j.version}</version>

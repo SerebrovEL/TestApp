@@ -1,12 +1,14 @@
 package com.mycompany.testapp.services;
 
 import com.mycompany.testapp.model.Mkb10;
-import java.io.File;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+
 import java.net.URISyntaxException;
 import java.net.URL;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.logging.Level;
@@ -32,21 +34,12 @@ public class DataService {
 		return data;
 	}
 
-	/*
-        The resource URL is not working in the JAR
-        If we try to access a file that is inside a JAR,
-        It throws NoSuchFileException (linux), InvalidPathException (Windows)
-
-        Resource URL Sample: file:java-io.jar!/json/file1.json
-	 */
 	private File getFileFromResource(String fileName) throws URISyntaxException {
 		ClassLoader classLoader = getClass().getClassLoader();
 		URL resource = classLoader.getResource(fileName);
 		if (resource == null) {
 			throw new IllegalArgumentException("file not found! " + fileName);
 		} else {
-			// failed if files have whitespaces or special characters
-			//return new File(resource.getFile());
 			return new File(resource.toURI());
 		}
 	}
