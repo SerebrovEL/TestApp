@@ -91,10 +91,7 @@
                 <artifactId>jetty-maven-plugin</artifactId>
                 <configuration>
                     <scan>2</scan>
-                    <webAppConfig>
-                        <allowDuplicateFragmentNames>true</allowDuplicateFragmentNames>
-                    </webAppConfig>
-                </configuration>
+                 </configuration>
                 <version>${jetty.version}</version>
             </plugin>
             <plugin>

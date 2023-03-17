@@ -9,16 +9,13 @@ import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
-import com.vaadin.flow.component.treegrid.TreeGrid;
-import com.vaadin.flow.data.provider.hierarchy.TreeData;
 import com.vaadin.flow.data.value.ValueChangeMode;
 import com.vaadin.flow.router.Route;
 import java.util.Collection;
-import java.util.stream.Collectors;
 
 @Route
 public class MainView extends VerticalLayout {
-
+	
 	public MainView() {
 		Grid<Mkb10> grid = new Grid<Mkb10>(Mkb10.class, false);
 		grid.addColumn(Mkb10::getCode).setHeader("Код").setSortable(true);
@@ -30,7 +27,7 @@ public class MainView extends VerticalLayout {
 		GridListDataView<Mkb10> dataView = grid.setItems(mkb10s);
 
 		TextField searchField = new TextField();
-		searchField.setWidth("50%");
+		searchField.setWidth("100%");
 		searchField.setPlaceholder("Search");
 		searchField.setPrefixComponent(new Icon(VaadinIcon.SEARCH));
 		searchField.setValueChangeMode(ValueChangeMode.EAGER);
@@ -47,31 +44,7 @@ public class MainView extends VerticalLayout {
 			return matchesCode || matchesName || matchesCodeParent;
 		});
 		
-		TreeData<String> data = new TreeData<>();
-		Collection<String> root = mkb10s.stream()
-			.filter(elem -> elem.getCodeParent().isEmpty())
-			.map(elem -> elem.getCode())
-			.distinct()
-			.collect(Collectors.toList());
-		for (var elem : root) {
-			if (!data.contains(elem)) {
-				data.addItems(null, elem);
-			}
-		}
-		data.getRootItems().forEach(elem -> {
-			Collection<String> temp = mkb10s.stream()
-				.filter(el -> el.getCodeParent().contains(elem))
-				.map(el -> el.getCode())
-				.distinct()
-				.collect(Collectors.toList());
-			data.addItems(elem, temp);
-		});
-		TreeGrid<String> treeGrid = new TreeGrid<>();
-		treeGrid.setTreeData(data);
-		
-		VerticalLayout hLayout = new VerticalLayout(treeGrid, grid);
-		hLayout.setPadding(true);
-		VerticalLayout vLayout = new VerticalLayout(searchField, hLayout);
+		VerticalLayout vLayout = new VerticalLayout(searchField, grid);
 		vLayout.setPadding(false);
 
 		add(vLayout);
