@@ -33,82 +33,53 @@ public class Mkb10TreeData {
 	}
 
 	protected void addRoot(Collection<Mkb10> mkb10s) {
-		Collection<Mkb10> roots = mkb10s.stream()
+		mkb10s.stream()
 			.filter(elem -> elem.getCodeParent() == null
 			|| elem.getCodeParent().trim().isEmpty()
 			|| elem.getCodeParent().trim().isBlank()
 			|| elem.getCodeParent().trim().contains("NULL"))
 			.sorted((o1, o2) -> o1.getCode().trim().compareTo(o2.getCode().trim()))
 			.distinct()
-			.collect(Collectors.toList());
-		roots.forEach(elem -> this.dataList.add(new Mkb10Data(elem.getCode(), elem.getName(), "", null)));
-		roots.forEach(root -> {
-			mkb10s.stream()
-				.filter(elem -> elem.getCodeParent() != null
-				&& !elem.getCodeParent().trim().isEmpty()
-				&& elem.getCodeParent().trim().equalsIgnoreCase(root.getCode().trim())
-				)
-				.sorted((o1, o2) -> o1.getCode().trim().compareTo(o2.getCode().trim()))
-				.collect(Collectors.toList())
-				.forEach(
-					elem
-					-> {
-					this.dataList
-						.add(
-							new Mkb10Data(
-								elem.getCode().trim(),
-								elem.getName().trim(),
-								"",
-								this.dataList
-									.stream()
-									.filter(el -> el.getCode()
-									.trim()
-									.equalsIgnoreCase(root.getCode().trim())
-									).findFirst()
-									.orElse(null)
-							)
-						);
-				}
-				);
-		});
+			.collect(Collectors.toList())
+			.forEach(elem -> this.dataList.add(new Mkb10Data(elem.getCode(), elem.getName(), "", null)));
 	}
 
 	protected void addChild(Collection<Mkb10> mkb10s) {
 		int i = 0;
 		while (true) {
-			final int level = ++i;
+			final int level = i++;
 			Collection<Mkb10Data> par = this.dataList.stream()
-				.filter(elem -> elem.getParent() != null && elem.getLevel() == level)
+				.filter(elem -> elem.getLevel() == level)
 				.sorted((o1, o2) -> o1.getCode().trim().compareTo(o2.getCode().trim()))
 				.collect(Collectors.toList());
 			if (par.isEmpty()) {
 				break;
 			}
-			for (Mkb10Data root : par) {
-				Collection<Mkb10> childs = mkb10s.stream()
+			par.forEach(root -> {
+				mkb10s.stream()
 					.filter(elem -> elem.getCodeParent() != null
 					&& !elem.getCodeParent().trim().isEmpty()
 					&& elem.getCodeParent().trim().equalsIgnoreCase(root.getCode().trim())
 					)
 					.sorted((o1, o2) -> o1.getCode().trim().compareTo(o2.getCode().trim()))
-					.collect(Collectors.toList());
-				for (Mkb10 elem : childs) {
-					this.dataList
-						.add(
-							new Mkb10Data(
-								elem.getCode().trim(),
-								elem.getName().trim(),
-								"",
-								this.dataList
-									.stream()
-									.filter(el -> el.getCode()
-									.trim()
-									.equalsIgnoreCase(root.getCode().trim()))
-									.findFirst().orElse(null)
-							)
-						);
-				}
-			}
+					.collect(Collectors.toList())
+					.forEach(elem -> {
+						this.dataList
+							.add(
+								new Mkb10Data(
+									elem.getCode().trim(),
+									elem.getName().trim(),
+									"",
+									this.dataList
+										.stream()
+										.filter(el -> el.getCode()
+										.trim()
+										.equalsIgnoreCase(root.getCode().trim()))
+										.findFirst().orElse(null)
+								)
+							);
+					});
+			});
 		}
 	}
 
