@@ -5,6 +5,7 @@ import com.mycompany.testapp.model.Mkb10Data;
 import com.mycompany.testapp.model.Mkb10TreeData;
 import com.mycompany.testapp.services.DataService;
 import com.vaadin.componentfactory.explorer.ExplorerTreeGrid;
+import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.Grid.MultiSortPriority;
 import com.vaadin.flow.component.grid.dataview.GridListDataView;
@@ -35,19 +36,6 @@ public class MainView extends VerticalLayout {
 		searchField.setPrefixComponent(new Icon(VaadinIcon.SEARCH));
 		searchField.setValueChangeMode(ValueChangeMode.EAGER);
 		searchField.addValueChangeListener(e -> dataView.refreshAll());
-		searchField.addKeyPressListener(listener -> {
-			dataView.removeFilters();
-			dataView.addFilter(mkb10 -> {
-				String searchTerm = searchField.getValue().trim();
-				if (searchTerm.isEmpty()) {
-					return true;
-				}
-				boolean matchesCode = matchesTerm(mkb10.getCode(), searchTerm);
-				boolean matchesName = matchesTerm(mkb10.getName(), searchTerm);
-				boolean matchesCodeParent = matchesTerm(mkb10.getCodeParent(), searchTerm);
-				return matchesCode || matchesName || matchesCodeParent;
-			});
-		});
 
 		Mkb10TreeData mkb10TreeData = new Mkb10TreeData();
 		mkb10TreeData.createTreeData(mkb10s);
@@ -72,10 +60,24 @@ public class MainView extends VerticalLayout {
 				dataView.removeFilters();
 			}
 		});
+		searchField.addKeyPressListener(listener -> {
+			treeGrid.deselectAll();
+			dataView.removeFilters();
+			dataView.addFilter(mkb10 -> {
+				String searchTerm = searchField.getValue().trim();
+				if (searchTerm.isEmpty()) {
+					return true;
+				}
+				boolean matchesCode = matchesTerm(mkb10.getCode(), searchTerm);
+				boolean matchesName = matchesTerm(mkb10.getName(), searchTerm);
+				boolean matchesCodeParent = matchesTerm(mkb10.getCodeParent(), searchTerm);
+				return matchesCode || matchesName || matchesCodeParent;
+			});
+		});
 
 		VerticalLayout vLayout = new VerticalLayout(treeGrid, searchField, grid);
 		vLayout.setPadding(true);
-
+		
 		add(vLayout);
 	}
 
