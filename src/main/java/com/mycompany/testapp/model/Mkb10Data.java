@@ -5,7 +5,6 @@ import java.util.Objects;
 public class Mkb10Data {
 
 	private String code;
-	private String name;
 	private String icon;
 	private Mkb10Data parent;
 	private int level;
@@ -13,9 +12,8 @@ public class Mkb10Data {
 	public Mkb10Data() {
 	}
 
-	public Mkb10Data(String code, String name, String icon, Mkb10Data parent) {
+	public Mkb10Data(String code, String icon, Mkb10Data parent) {
 		this.code = code;
-		this.name = name;
 		this.icon = icon;
 		this.parent = parent;
 		if (parent == null) {
@@ -31,14 +29,6 @@ public class Mkb10Data {
 
 	public void setCode(String code) {
 		this.code = code;
-	}
-
-	public String getName() {
-		return name;
-	}
-
-	public void setName(String name) {
-		this.name = name;
 	}
 
 	public String getIcon() {
@@ -61,15 +51,10 @@ public class Mkb10Data {
 		return level;
 	}
 
-	public void setLevel(int level) {
-		this.level = level;
-	}
-
 	@Override
 	public int hashCode() {
 		int hash = 3;
 		hash = 89 * hash + Objects.hashCode(this.code);
-		hash = 89 * hash + Objects.hashCode(this.name);
 		hash = 89 * hash + Objects.hashCode(this.icon);
 		hash = 89 * hash + Objects.hashCode(this.parent);
 		hash = 89 * hash + this.level;
@@ -94,9 +79,6 @@ public class Mkb10Data {
 		if (!Objects.equals(this.code, other.code)) {
 			return false;
 		}
-		if (!Objects.equals(this.name, other.name)) {
-			return false;
-		}
 		if (!Objects.equals(this.icon, other.icon)) {
 			return false;
 		}
@@ -105,7 +87,7 @@ public class Mkb10Data {
 
 	@Override
 	public String toString() {
-		return "Mkb10Data{" + "code=" + code + ", name=" + name + ", icon=" + icon + ", parent=" + parent + ", level=" + level + '}';
+		return "Mkb10Data{" + "code=" + code + ", icon=" + icon + ", parent=" + parent + ", level=" + level + '}';
 	}
 
 }

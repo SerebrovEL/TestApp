@@ -41,7 +41,7 @@ public class Mkb10TreeData {
 			.sorted((o1, o2) -> o1.getCode().trim().compareTo(o2.getCode().trim()))
 			.distinct()
 			.collect(Collectors.toList())
-			.forEach(elem -> this.dataList.add(new Mkb10Data(elem.getCode(), elem.getName(), "", null)));
+			.forEach(elem -> this.dataList.add(new Mkb10Data(elem.getCode(), "", null)));
 	}
 
 	protected void addChild(Collection<Mkb10> mkb10s) {
@@ -68,7 +68,6 @@ public class Mkb10TreeData {
 							.add(
 								new Mkb10Data(
 									elem.getCode().trim(),
-									elem.getName().trim(),
 									"",
 									this.dataList
 										.stream()
