@@ -3,7 +3,6 @@ package com.mycompany.testapp.services;
 import com.mycompany.testapp.model.Mkb10;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 
 import java.net.URISyntaxException;
@@ -11,26 +10,51 @@ import java.net.URL;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
-import org.apache.poi.xssf.usermodel.XSSFRow;
-import org.apache.poi.xssf.usermodel.XSSFSheet;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+import org.xml.sax.SAXException;
 
 public class DataService {
 
-	private static final Collection<Mkb10> data = new ArrayList<>();
-
-	public DataService() {
+	public Collection<Mkb10> getData() {
+		Collection<Mkb10> data = new ArrayList<>();
 		try {
-			readFromExcel("mkb10.xlsx");
-		} catch (IOException | URISyntaxException ex) {
-			Logger.getLogger(DataService.class.getName()).log(Level.SEVERE, null, ex);
+			DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+			DocumentBuilder db = dbf.newDocumentBuilder();
+			Document document = db.parse(getFileFromResource("mkb10.xml"));
+			document.getDocumentElement().normalize();
+			NodeList nList = document.getElementsByTagName("entry");
+			for (int temp = 0; temp < nList.getLength(); temp++) {
+				Node nNode = nList.item(temp);
+				if (nNode.getNodeType() == Node.ELEMENT_NODE) {
+					Element eElement = (Element) nNode;
+					data.add(new Mkb10(
+						eElement.getElementsByTagName("ID").item(0) != null ? 
+							eElement.getElementsByTagName("ID").item(0).getTextContent() : "",
+						eElement.getElementsByTagName("REC_CODE").item(0) != null ? 
+							eElement.getElementsByTagName("REC_CODE").item(0).getTextContent() : "",
+						eElement.getElementsByTagName("MKB_CODE").item(0) != null ? 
+							eElement.getElementsByTagName("MKB_CODE").item(0).getTextContent() : "",
+						eElement.getElementsByTagName("MKB_NAME").item(0) != null ? 
+							eElement.getElementsByTagName("MKB_NAME").item(0).getTextContent() : "",
+						eElement.getElementsByTagName("ID_PARENT").item(0) != null ? 
+							eElement.getElementsByTagName("ID_PARENT").item(0).getTextContent() : "",
+						eElement.getElementsByTagName("ACTUAL").item(0) != null ?
+							eElement.getElementsByTagName("ACTUAL").item(0).getTextContent() : ""
+					)
+					);
+				}
+			}
+		} catch (IOException | URISyntaxException | ParserConfigurationException | SAXException ex) {
+			System.out.println("Error: " + ex.getLocalizedMessage());
 		}
-	}
-
-	public static Collection<Mkb10> getData() {
 		return data;
 	}
 
@@ -41,21 +65,6 @@ public class DataService {
 			throw new IllegalArgumentException("file not found! " + fileName);
 		} else {
 			return new File(resource.toURI());
-		}
-	}
-
-	private void readFromExcel(String file) throws IOException, URISyntaxException {
-
-		try (XSSFWorkbook myExcelBook = new XSSFWorkbook(new FileInputStream(getFileFromResource(file)))) {
-			XSSFSheet myExcelSheet = myExcelBook.getSheet("МКБ-10");
-			for (int i = 4; i <= myExcelSheet.getLastRowNum(); i++) {
-				XSSFRow row = myExcelSheet.getRow(i);
-				data.add(
-					new Mkb10(row.getCell(0).getStringCellValue(),
-						row.getCell(1).getStringCellValue(),
-						row.getCell(2).getStringCellValue())
-				);
-			}
 		}
 	}
 
