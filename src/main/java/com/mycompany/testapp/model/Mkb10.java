@@ -8,18 +8,18 @@ public class Mkb10 {
 	private String recCode;
 	private String code;
 	private String name;
-	private String codeParent;
+	private String parentId;
 	private String actusl;
 
 	public Mkb10() {
 	}
 
-	public Mkb10(String id, String recCode, String code, String name, String codeParent, String actusl) {
+	public Mkb10(String id, String recCode, String code, String name, String parentId, String actusl) {
 		this.id = id;
 		this.recCode = recCode;
 		this.code = code;
 		this.name = name;
-		this.codeParent = codeParent;
+		this.parentId = parentId;
 		this.actusl = actusl;
 	}
 
@@ -55,16 +55,16 @@ public class Mkb10 {
 		this.name = name;
 	}
 
-	public String getCodeParent() {
-		return codeParent;
+	public String getParentId() {
+		return parentId;
 	}
 
-	public void setCodeParent(String codeParent) {
-		this.codeParent = codeParent;
+	public void setParentId(String parentId) {
+		this.parentId = parentId;
 	}
 
 	public String getActusl() {
-		return actusl.equalsIgnoreCase("1") ? "Актуальна" : "Не актуальна";
+		return actusl;
 	}
 
 	public void setActusl(String actusl) {
@@ -73,13 +73,13 @@ public class Mkb10 {
 
 	@Override
 	public int hashCode() {
-		int hash = 5;
-		hash = 79 * hash + Objects.hashCode(this.id);
-		hash = 79 * hash + Objects.hashCode(this.recCode);
-		hash = 79 * hash + Objects.hashCode(this.code);
-		hash = 79 * hash + Objects.hashCode(this.name);
-		hash = 79 * hash + Objects.hashCode(this.codeParent);
-		hash = 79 * hash + Objects.hashCode(this.actusl);
+		int hash = 7;
+		hash = 29 * hash + Objects.hashCode(this.id);
+		hash = 29 * hash + Objects.hashCode(this.recCode);
+		hash = 29 * hash + Objects.hashCode(this.code);
+		hash = 29 * hash + Objects.hashCode(this.name);
+		hash = 29 * hash + Objects.hashCode(this.parentId);
+		hash = 29 * hash + Objects.hashCode(this.actusl);
 		return hash;
 	}
 
@@ -107,7 +107,7 @@ public class Mkb10 {
 		if (!Objects.equals(this.name, other.name)) {
 			return false;
 		}
-		if (!Objects.equals(this.codeParent, other.codeParent)) {
+		if (!Objects.equals(this.parentId, other.parentId)) {
 			return false;
 		}
 		return Objects.equals(this.actusl, other.actusl);
@@ -115,7 +115,7 @@ public class Mkb10 {
 
 	@Override
 	public String toString() {
-		return "Mkb10{" + "id=" + id + ", recCode=" + recCode + ", code=" + code + ", name=" + name + ", codeParent=" + codeParent + ", actusl=" + actusl + '}';
+		return "Mkb10{" + "id=" + id + ", recCode=" + recCode + ", code=" + code + ", name=" + name + ", parentId=" + parentId + ", actusl=" + actusl + '}';
 	}
 
 }

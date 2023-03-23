@@ -16,17 +16,17 @@ public class Mkb10TreeService {
 	public Mkb10TreeService(List<Mkb10> mkb10s) {
 		if (mkb10s != null) {
 			this.dataRootList = mkb10s.stream()
-				.filter(elem -> elem.getCodeParent() == null
-				|| elem.getCodeParent().trim().isEmpty()
-				|| elem.getCodeParent().trim().isBlank()
-				|| elem.getCodeParent().trim().equalsIgnoreCase("NULL"))
+				.filter(elem -> elem.getParentId()== null
+				|| elem.getParentId().trim().isEmpty()
+				|| elem.getParentId().trim().isBlank()
+				|| elem.getParentId().trim().equalsIgnoreCase("NULL"))
 				.collect(Collectors.toList());
 			this.dataChildList = mkb10s.stream()
-				.filter(elem -> !(elem.getCodeParent() == null
-				|| elem.getCodeParent().trim().isEmpty()
-				|| elem.getCodeParent().trim().isBlank()
-				|| elem.getCodeParent().trim().equalsIgnoreCase("NULL")))
-				.collect(Collectors.groupingBy(Mkb10::getCodeParent));
+				.filter(elem -> !(elem.getParentId() == null
+				|| elem.getParentId().trim().isEmpty()
+				|| elem.getParentId().trim().isBlank()
+				|| elem.getParentId().trim().equalsIgnoreCase("NULL")))
+				.collect(Collectors.groupingBy(Mkb10::getParentId));
 		} else {
 			this.dataRootList = new ArrayList<>();
 			this.dataChildList = new HashMap<>();

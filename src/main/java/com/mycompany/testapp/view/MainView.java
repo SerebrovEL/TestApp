@@ -50,8 +50,7 @@ public class MainView extends HorizontalLayout {
 		grid.addColumn(Mkb10::getRecCode).setHeader("Код записи").setSortable(true);
 		grid.addColumn(Mkb10::getCode).setHeader("Код").setSortable(true);
 		grid.addColumn(Mkb10::getName).setHeader("Наименование").setSortable(true);
-		grid.addColumn(Mkb10::getCodeParent).setHeader("ID родителя").setSortable(true);
-		grid.addColumn(Mkb10::getActusl).setHeader("Актуальность записи").setSortable(true);
+		grid.addColumn(Mkb10::getParentId).setHeader("ID родителя").setSortable(true);
 		grid.setMultiSort(false, MultiSortPriority.APPEND);
 		grid.setItems(mkb10s);
 		return grid;
@@ -114,16 +113,16 @@ public class MainView extends HorizontalLayout {
 				}
 				Mkb10 sel = treeGrid.getSelectedItems().stream().findFirst().orElse(null);
 				if (sel == null) {
-					boolean matchesCode = matchesTermCode(mkb10.getCode(), searchTerm);
-					boolean matchesName = matchesTerm(mkb10.getName(), searchTerm);
-					boolean matchesCodeParent = matchesTermCode(mkb10.getCodeParent(), searchTerm);
-					return matchesCode || matchesName || matchesCodeParent;
+					return matchesTerm(mkb10.getId(), searchTerm)
+						|| matchesTerm(mkb10.getCode(), searchTerm)
+						|| matchesTerm(mkb10.getName(), searchTerm)
+						|| matchesTerm(mkb10.getParentId(), searchTerm);
 				} else {
-					boolean b = matchesTermRecCode(mkb10.getRecCode().trim(), searchTerm);
-					boolean matchesCode = matchesTermCode(mkb10.getCode(), searchTerm);
-					boolean matchesName = matchesTerm(mkb10.getName(), searchTerm);
-					boolean matchesCodeParent = matchesTermCode(mkb10.getCodeParent(), searchTerm);
-					return b || (matchesCode || matchesName || matchesCodeParent);
+					return matchesTermRecCode(mkb10.getRecCode().trim(), sel.getRecCode())
+						&& (matchesTerm(mkb10.getId(), searchTerm)
+						|| matchesTerm(mkb10.getCode(), searchTerm)
+						|| matchesTerm(mkb10.getName(), searchTerm)
+						|| matchesTerm(mkb10.getParentId(), searchTerm));
 				}
 			});
 			if (searchField.getValue().trim().isEmpty()
@@ -141,7 +140,4 @@ public class MainView extends HorizontalLayout {
 		return value.toLowerCase().contains(searchTerm.toLowerCase());
 	}
 
-	private boolean matchesTermCode(String value, String searchTerm) {
-		return value.toLowerCase().indexOf(searchTerm.toLowerCase()) == 0;
-	}
 }
