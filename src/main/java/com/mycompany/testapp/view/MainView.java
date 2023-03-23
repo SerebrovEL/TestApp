@@ -13,13 +13,13 @@ import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.value.ValueChangeMode;
 import com.vaadin.flow.router.Route;
-import java.util.Collection;
+import java.util.List;
 
 @Route
 public class MainView extends HorizontalLayout {
 
 	public MainView() {
-		Collection<Mkb10> mkb10s = (new DataService()).getData();
+		List<Mkb10> mkb10s = (new DataService()).getData();
 		Mkb10TreeService mkb10TreeService = new Mkb10TreeService(mkb10s);
 
 		Grid<Mkb10> grid = new Grid<>(Mkb10.class, false);

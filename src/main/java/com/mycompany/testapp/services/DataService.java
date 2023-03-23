@@ -9,7 +9,7 @@ import java.net.URISyntaxException;
 import java.net.URL;
 
 import java.util.ArrayList;
-import java.util.Collection;
+import java.util.List;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -23,8 +23,8 @@ import org.xml.sax.SAXException;
 
 public class DataService {
 
-	public Collection<Mkb10> getData() {
-		Collection<Mkb10> data = new ArrayList<>();
+	public List<Mkb10> getData() {
+		List<Mkb10> data = new ArrayList<>();
 		try {
 			DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
 			DocumentBuilder db = dbf.newDocumentBuilder();
