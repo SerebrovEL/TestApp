@@ -20,6 +20,7 @@ import com.vaadin.flow.data.value.ValueChangeMode;
 import com.vaadin.flow.router.Route;
 
 import java.util.List;
+import java.util.function.BiFunction;
 import java.util.function.Function;
 
 @Route
@@ -85,11 +86,11 @@ public class MainView extends HorizontalLayout {
 			Mkb10 sel = listener.getFirstSelectedItem().orElse(null);
 			if (sel != null) {
 				grid.getListDataView().addFilter(mkb10 -> {
-					String searchTerm = sel.getRecCode().trim();
-					if (searchTerm.isEmpty()) {
+					String selectionTerm = sel.getRecCode().trim();
+					if (isEmpty.apply(selectionTerm)) {
 						return true;
 					}
-					return matchesTermRecCode(mkb10.getRecCode().trim(), searchTerm);
+					return matchesTermRecCode.apply(mkb10.getRecCode().trim(), selectionTerm);
 				});
 			} else {
 				grid.getListDataView().removeFilters();
@@ -108,36 +109,42 @@ public class MainView extends HorizontalLayout {
 	private void addKeyPressListenerSearchField(ExplorerTreeGrid<Mkb10> treeGrid, Grid<Mkb10> grid, TextField searchField) {
 		searchField.addKeyPressListener(listener -> {
 			grid.getListDataView().addFilter(mkb10 -> {
-				Mkb10 sel = treeGrid.getSelectedItems().stream().findFirst().orElse(null);
 				String searchTerm = searchField.getValue().trim();
-				if (searchTerm.isEmpty()) {
+				if (isEmpty.apply(searchTerm)) {
 					return true;
 				}
-				final Function<Mkb10, Boolean> isNull = elem -> elem == null;
-				final Function<Mkb10, Boolean> matchTerm = elem -> matchesTerm(elem.getId(), searchTerm)
-					|| matchesTerm(elem.getCode(), searchTerm)
-					|| matchesTerm(elem.getName(), searchTerm)
-					|| matchesTerm(elem.getParentId(), searchTerm);
-				final Function<Mkb10, Boolean> matchTermTree = elem
-					-> matchesTermRecCode(elem.getRecCode(), sel.getRecCode());
+				Mkb10 sel = treeGrid.getSelectedItems()
+					.stream().findFirst().orElse(null);
 				if (isNull.apply(sel)) {
-					return matchTerm.apply(mkb10);
+					return matchTerm.apply(mkb10, searchTerm);
 				}
-				return matchTermTree.apply(mkb10) && matchTerm.apply(mkb10);
+				return matchTermTree.apply(mkb10, sel)
+					&& matchTerm.apply(mkb10, searchTerm);
 			});
 			if (searchField.getValue().trim().isEmpty()
-				&& treeGrid.getSelectedItems().stream().findFirst().orElse(null) == null) {
+				&& treeGrid.getSelectedItems().stream()
+					.findFirst().orElse(null) == null) {
 				grid.getListDataView().removeFilters();
 			}
 		});
 	}
 
-	private boolean matchesTermRecCode(String value, String searchTerm) {
-		return value.toLowerCase().indexOf(searchTerm.toLowerCase()) == 0;
-	}
+	private final Function<String, Boolean> isEmpty = elem -> elem.isEmpty();
 
-	private boolean matchesTerm(String value, String searchTerm) {
-		return value.toLowerCase().contains(searchTerm.toLowerCase());
-	}
+	private final Function<Mkb10, Boolean> isNull = elem -> elem == null;
+
+	private final BiFunction<String, String, Boolean> matchesTermRecCode =
+		(value, searchTerm) -> value.toLowerCase().indexOf(searchTerm.toLowerCase()) == 0;
+
+	private final BiFunction<String, String, Boolean> matchesTerm =
+		(value, searchTerm) -> value.toLowerCase().contains(searchTerm.toLowerCase());
+
+	private final BiFunction<Mkb10, String, Boolean> matchTerm = (elem, terms) -> matchesTerm.apply(elem.getId(), terms)
+		||  matchesTerm.apply(elem.getCode(), terms)
+		||  matchesTerm.apply(elem.getName(), terms)
+		||  matchesTerm.apply(elem.getParentId(), terms);
+
+	private final BiFunction<Mkb10, Mkb10, Boolean> matchTermTree = (elem, sTreeElem)
+		-> matchesTermRecCode.apply(elem.getRecCode(), sTreeElem.getRecCode());
 
 }
