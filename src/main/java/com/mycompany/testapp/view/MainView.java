@@ -22,6 +22,23 @@ public class MainView extends HorizontalLayout {
 		List<Mkb10> mkb10s = (new DataService()).getData();
 		Mkb10TreeService mkb10TreeService = new Mkb10TreeService(mkb10s);
 
+		Grid<Mkb10> grid = createGrid(mkb10s);
+		TextField searchField = createTextField(grid);
+		ExplorerTreeGrid<Mkb10> treeGrid = createExplorerTreeGrid(mkb10TreeService);
+		VerticalLayout vLayout = createVerticalLayout(grid, searchField);
+
+		addSelectionListenerTreeGrid(treeGrid, grid, searchField);
+		addKeyPressListenerSearchField(treeGrid, grid, searchField);
+
+		this.add(treeGrid);
+		this.add(vLayout);
+		this.setVerticalComponentAlignment(Alignment.START, treeGrid);
+		this.setVerticalComponentAlignment(Alignment.START, vLayout);
+		this.setHeightFull();
+
+	}
+
+	private Grid<Mkb10> createGrid(List<Mkb10> mkb10s) {
 		Grid<Mkb10> grid = new Grid<>(Mkb10.class, false);
 		grid.addColumn(Mkb10::getId).setHeader("ID").setSortable(true);
 		grid.addColumn(Mkb10::getRecCode).setHeader("Код записи").setSortable(true);
@@ -29,16 +46,22 @@ public class MainView extends HorizontalLayout {
 		grid.addColumn(Mkb10::getName).setHeader("Наименование").setSortable(true);
 		grid.addColumn(Mkb10::getCodeParent).setHeader("ID родителя").setSortable(true);
 		grid.addColumn(Mkb10::getActusl).setHeader("Актуальность записи").setSortable(true);
-		grid.setMultiSort(true, MultiSortPriority.APPEND);
+		grid.setMultiSort(false, MultiSortPriority.APPEND);
 		grid.setItems(mkb10s);
+		return grid;
+	}
 
+	private TextField createTextField(Grid<Mkb10> grid) {
 		TextField searchField = new TextField();
 		searchField.setWidth("50%");
 		searchField.setPlaceholder("Search");
 		searchField.setPrefixComponent(new Icon(VaadinIcon.SEARCH));
 		searchField.setValueChangeMode(ValueChangeMode.EAGER);
 		searchField.addValueChangeListener(e -> grid.getListDataView().refreshAll());
+		return searchField;
+	}
 
+	private ExplorerTreeGrid<Mkb10> createExplorerTreeGrid(Mkb10TreeService mkb10TreeService) {
 		ExplorerTreeGrid<Mkb10> treeGrid = new ExplorerTreeGrid<>();
 		treeGrid.setAllRowsVisible(false);
 		treeGrid.setItems(mkb10TreeService.getRootTreeData(), mkb10TreeService::getChildTreeData);
@@ -47,6 +70,10 @@ public class MainView extends HorizontalLayout {
 		treeGrid.setSelectionMode(Grid.SelectionMode.SINGLE);
 		treeGrid.setHeight("100%");
 		treeGrid.setWidth("20%");
+		return treeGrid;
+	}
+
+	private void addSelectionListenerTreeGrid(ExplorerTreeGrid<Mkb10> treeGrid, Grid<Mkb10> grid, TextField searchField) {
 		treeGrid.addSelectionListener(listener -> {
 			grid.getListDataView().removeFilters();
 			Mkb10 sel = listener.getFirstSelectedItem().orElse(null);
@@ -63,6 +90,16 @@ public class MainView extends HorizontalLayout {
 				searchField.setValue("");
 			}
 		});
+	}
+
+	private VerticalLayout createVerticalLayout(Grid<Mkb10> grid, TextField searchField) {
+		VerticalLayout vLayout = new VerticalLayout(searchField, grid);
+		vLayout.setPadding(true);
+		vLayout.setHeight("100%");
+		return vLayout;
+	}
+
+	private void addKeyPressListenerSearchField(ExplorerTreeGrid<Mkb10> treeGrid, Grid<Mkb10> grid, TextField searchField) {
 		searchField.addKeyPressListener(listener -> {
 			grid.getListDataView().addFilter(mkb10 -> {
 				String searchTerm = searchField.getValue().trim();
@@ -88,17 +125,6 @@ public class MainView extends HorizontalLayout {
 				grid.getListDataView().removeFilters();
 			}
 		});
-
-		VerticalLayout vLayout = new VerticalLayout(searchField, grid);
-		vLayout.setPadding(true);
-		vLayout.setHeight("100%");
-
-		this.add(treeGrid);
-		this.add(vLayout);
-		this.setVerticalComponentAlignment(Alignment.START, treeGrid);
-		this.setVerticalComponentAlignment(Alignment.START, vLayout);
-		this.setHeightFull();
-
 	}
 
 	private boolean matchesTermRecCode(String value, String searchTerm) {
