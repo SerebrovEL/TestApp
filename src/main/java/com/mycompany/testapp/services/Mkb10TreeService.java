@@ -8,26 +8,26 @@ import java.util.stream.Collectors;
 
 public class Mkb10TreeService {
 
-	private List<Mkb10> dataList = null;
-	private Map<String, List<Mkb10>> dataChild = null;
+	private List<Mkb10> dataRootList = null;
+	private Map<String, List<Mkb10>> dataChildList = null;
 
 	public Mkb10TreeService(List<Mkb10> mkb10s) {
-		this.dataList = mkb10s;
-		this.dataChild = mkb10s.stream()
-			.collect(Collectors.groupingBy(Mkb10::getCodeParent));
-	}
-
-	public List<Mkb10> getRootTreeData() {
-		return this.dataList.stream()
+		this.dataRootList = mkb10s.stream()
 			.filter(elem -> elem.getCodeParent() == null
 			|| elem.getCodeParent().trim().isEmpty()
 			|| elem.getCodeParent().trim().isBlank()
 			|| elem.getCodeParent().trim().equalsIgnoreCase("NULL"))
 			.collect(Collectors.toList());
+		this.dataChildList = mkb10s.stream()
+			.collect(Collectors.groupingBy(Mkb10::getCodeParent));
+	}
+
+	public List<Mkb10> getRootTreeData() {
+		return this.dataRootList;
 	}
 
 	public List<Mkb10> getChildTreeData(Mkb10 parent) {
-		return this.dataChild
+		return this.dataChildList
 			.getOrDefault(parent.getId(), new ArrayList<>());
 	}
 
