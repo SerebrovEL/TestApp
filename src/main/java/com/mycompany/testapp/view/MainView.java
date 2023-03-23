@@ -20,6 +20,7 @@ import com.vaadin.flow.data.value.ValueChangeMode;
 import com.vaadin.flow.router.Route;
 
 import java.util.List;
+import java.util.function.Function;
 
 @Route
 public class MainView extends HorizontalLayout {
@@ -107,23 +108,22 @@ public class MainView extends HorizontalLayout {
 	private void addKeyPressListenerSearchField(ExplorerTreeGrid<Mkb10> treeGrid, Grid<Mkb10> grid, TextField searchField) {
 		searchField.addKeyPressListener(listener -> {
 			grid.getListDataView().addFilter(mkb10 -> {
+				Mkb10 sel = treeGrid.getSelectedItems().stream().findFirst().orElse(null);
 				String searchTerm = searchField.getValue().trim();
 				if (searchTerm.isEmpty()) {
 					return true;
 				}
-				Mkb10 sel = treeGrid.getSelectedItems().stream().findFirst().orElse(null);
-				if (sel == null) {
-					return matchesTerm(mkb10.getId(), searchTerm)
-						|| matchesTerm(mkb10.getCode(), searchTerm)
-						|| matchesTerm(mkb10.getName(), searchTerm)
-						|| matchesTerm(mkb10.getParentId(), searchTerm);
-				} else {
-					return matchesTermRecCode(mkb10.getRecCode().trim(), sel.getRecCode())
-						&& (matchesTerm(mkb10.getId(), searchTerm)
-						|| matchesTerm(mkb10.getCode(), searchTerm)
-						|| matchesTerm(mkb10.getName(), searchTerm)
-						|| matchesTerm(mkb10.getParentId(), searchTerm));
+				final Function<Mkb10, Boolean> isNull = elem -> elem == null;
+				final Function<Mkb10, Boolean> matchTerm = elem -> matchesTerm(elem.getId(), searchTerm)
+					|| matchesTerm(elem.getCode(), searchTerm)
+					|| matchesTerm(elem.getName(), searchTerm)
+					|| matchesTerm(elem.getParentId(), searchTerm);
+				final Function<Mkb10, Boolean> matchTermTree = elem
+					-> matchesTermRecCode(elem.getRecCode(), sel.getRecCode());
+				if (isNull.apply(sel)) {
+					return matchTerm.apply(mkb10);
 				}
+				return matchTermTree.apply(mkb10) && matchTerm.apply(mkb10);
 			});
 			if (searchField.getValue().trim().isEmpty()
 				&& treeGrid.getSelectedItems().stream().findFirst().orElse(null) == null) {
