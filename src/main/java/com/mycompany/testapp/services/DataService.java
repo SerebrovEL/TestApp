@@ -8,7 +8,7 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
 
-import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -30,7 +30,7 @@ public class DataService {
 	private final Logger log = LoggerFactory.getLogger(DataService.class); // 1. Объявляем переменную логгера
 
 	public List<Mkb10> getData() {
-		List<Mkb10> data = new ArrayList<>();
+		List<Mkb10> data = new LinkedList<>();
 		try {
 			DocumentBuilderFactory dbf = DocumentBuilderFactory.newDefaultInstance();
 			DocumentBuilder db = dbf.newDocumentBuilder();

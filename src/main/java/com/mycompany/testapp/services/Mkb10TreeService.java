@@ -2,33 +2,37 @@ package com.mycompany.testapp.services;
 
 import com.mycompany.testapp.model.Mkb10;
 
-import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 public class Mkb10TreeService {
 
 	private List<Mkb10> dataRootList = null;
 	private Map<String, List<Mkb10>> dataChildList = null;
+	
+	private final Function<Mkb10, Boolean> rootFilter = elem -> elem.getParentId() == null
+		|| elem.getParentId().trim().isEmpty()
+		|| elem.getParentId().trim().isBlank()
+		|| elem.getParentId().trim().equalsIgnoreCase("NULL");
+	private final Function<Mkb10, Boolean> childFilter = elem -> !(elem.getParentId() == null
+		|| elem.getParentId().trim().isEmpty()
+		|| elem.getParentId().trim().isBlank()
+		|| elem.getParentId().trim().equalsIgnoreCase("NULL"));
 
 	public Mkb10TreeService(List<Mkb10> mkb10s) {
 		if (mkb10s != null) {
 			this.dataRootList = mkb10s.stream()
-				.filter(elem -> elem.getParentId()== null
-				|| elem.getParentId().trim().isEmpty()
-				|| elem.getParentId().trim().isBlank()
-				|| elem.getParentId().trim().equalsIgnoreCase("NULL"))
+				.filter(elem -> rootFilter.apply(elem))
 				.collect(Collectors.toList());
 			this.dataChildList = mkb10s.stream()
-				.filter(elem -> !(elem.getParentId() == null
-				|| elem.getParentId().trim().isEmpty()
-				|| elem.getParentId().trim().isBlank()
-				|| elem.getParentId().trim().equalsIgnoreCase("NULL")))
+				.filter(elem -> childFilter.apply(elem))
 				.collect(Collectors.groupingBy(Mkb10::getParentId));
 		} else {
-			this.dataRootList = new ArrayList<>();
+			this.dataRootList = new LinkedList<>();
 			this.dataChildList = new HashMap<>();
 		}
 	}
@@ -39,7 +43,7 @@ public class Mkb10TreeService {
 
 	public List<Mkb10> getChildTreeData(Mkb10 parent) {
 		return this.dataChildList
-			.getOrDefault(parent.getId(), new ArrayList<>());
+			.getOrDefault(parent.getId(), new LinkedList<>());
 	}
 
 }

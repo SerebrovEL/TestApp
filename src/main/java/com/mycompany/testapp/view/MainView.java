@@ -14,14 +14,11 @@ import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
-
 import com.vaadin.flow.data.value.ValueChangeMode;
-
 import com.vaadin.flow.router.Route;
 
 import java.util.List;
 import java.util.function.BiFunction;
-import java.util.function.Function;
 
 @Route
 public class MainView extends HorizontalLayout {
@@ -87,7 +84,7 @@ public class MainView extends HorizontalLayout {
 			if (sel != null) {
 				grid.getListDataView().addFilter(mkb10 -> {
 					String selectionTerm = sel.getRecCode().trim();
-					if (isEmpty.apply(selectionTerm)) {
+					if (selectionTerm.isEmpty()) {
 						return true;
 					}
 					return matchesTermRecCode.apply(mkb10.getRecCode().trim(), selectionTerm);
@@ -110,12 +107,12 @@ public class MainView extends HorizontalLayout {
 		searchField.addKeyPressListener(listener -> {
 			grid.getListDataView().addFilter(mkb10 -> {
 				String searchTerm = searchField.getValue().trim();
-				if (isEmpty.apply(searchTerm)) {
+				if (searchTerm.isEmpty()) {
 					return true;
 				}
 				Mkb10 sel = treeGrid.getSelectedItems()
 					.stream().findFirst().orElse(null);
-				if (isNull.apply(sel)) {
+				if (sel == null) {
 					return matchTerm.apply(mkb10, searchTerm);
 				}
 				return matchTermTree.apply(mkb10, sel)
@@ -128,10 +125,6 @@ public class MainView extends HorizontalLayout {
 			}
 		});
 	}
-
-	private final Function<String, Boolean> isEmpty = elem -> elem.isEmpty();
-
-	private final Function<Mkb10, Boolean> isNull = elem -> elem == null;
 
 	private final BiFunction<String, String, Boolean> matchesTermRecCode =
 		(value, searchTerm) -> value.toLowerCase().indexOf(searchTerm.toLowerCase()) == 0;
