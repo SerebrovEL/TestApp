@@ -5,19 +5,16 @@ import com.mycompany.testapp.model.Mkb10;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.HashMap;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
 public class Mkb10TreeService {
 
 	private List<Mkb10> dataRootList = null;
-	private Map<String, List<Mkb10>> dataChildList = null;
+	private Map<Long, List<Mkb10>> dataChildList = null;
 
-	private final Function<Mkb10, Boolean> rootFilter = elem -> elem.getParentId() == null
-		|| elem.getParentId().trim().isEmpty()
-		|| elem.getParentId().trim().isBlank()
-		|| elem.getParentId().trim().equalsIgnoreCase("NULL");
+	private final Function<Mkb10, Boolean> rootFilter = elem -> elem.getParentId() == null;
 	private final Function<Mkb10, Boolean> childFilter = elem -> !rootFilter.apply(elem);
 
 	public Mkb10TreeService(List<Mkb10> mkb10s) {
@@ -30,7 +27,7 @@ public class Mkb10TreeService {
 				.collect(Collectors.groupingByConcurrent(Mkb10::getParentId));
 		} else {
 			this.dataRootList = new LinkedList<>();
-			this.dataChildList = new ConcurrentHashMap<>();
+			this.dataChildList = new HashMap<>();
 		}
 	}
 

@@ -50,9 +50,10 @@ public class DataService {
 	}
 
 	private Mkb10 getMkb10(Element eElement) {
+
 		return new Mkb10(
-			eElement.getElementsByTagName("ID").item(0) != null
-			? eElement.getElementsByTagName("ID").item(0).getTextContent() : "",
+			Long.valueOf(eElement.getElementsByTagName("ID").item(0) != null
+				? eElement.getElementsByTagName("ID").item(0).getTextContent() : "0"),
 			eElement.getElementsByTagName("REC_CODE").item(0) != null
 			? eElement.getElementsByTagName("REC_CODE").item(0).getTextContent() : "",
 			eElement.getElementsByTagName("MKB_CODE").item(0) != null
@@ -60,10 +61,9 @@ public class DataService {
 			eElement.getElementsByTagName("MKB_NAME").item(0) != null
 			? eElement.getElementsByTagName("MKB_NAME").item(0).getTextContent() : "",
 			eElement.getElementsByTagName("ID_PARENT").item(0) != null
-			? eElement.getElementsByTagName("ID_PARENT").item(0).getTextContent() : "",
+			? Long.valueOf(eElement.getElementsByTagName("ID_PARENT").item(0).getTextContent()) : null,
 			eElement.getElementsByTagName("ACTUAL").item(0) != null
-			? eElement.getElementsByTagName("ACTUAL").item(0).getTextContent() : ""
-		);
+			? Boolean.TRUE : Boolean.FALSE);
 	}
 
 	private File getFileFromResource(String fileName) throws URISyntaxException {

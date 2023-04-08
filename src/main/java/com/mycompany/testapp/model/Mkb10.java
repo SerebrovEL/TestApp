@@ -4,17 +4,17 @@ import java.util.Objects;
 
 public class Mkb10 {
 
-	private String id;
+	private Long id;
 	private String recCode;
 	private String code;
 	private String name;
-	private String parentId;
-	private String actusl;
+	private Long parentId;
+	private Boolean actusl;
 
 	public Mkb10() {
 	}
 
-	public Mkb10(String id, String recCode, String code, String name, String parentId, String actusl) {
+	public Mkb10(Long id, String recCode, String code, String name, Long parentId, Boolean actusl) {
 		this.id = id;
 		this.recCode = recCode;
 		this.code = code;
@@ -23,11 +23,11 @@ public class Mkb10 {
 		this.actusl = actusl;
 	}
 
-	public String getId() {
+	public Long getId() {
 		return id;
 	}
 
-	public void setId(String id) {
+	public void setId(Long id) {
 		this.id = id;
 	}
 
@@ -55,32 +55,30 @@ public class Mkb10 {
 		this.name = name;
 	}
 
-	public String getParentId() {
+	public Long getParentId() {
 		return parentId;
 	}
 
-	public void setParentId(String parentId) {
+	public void setParentId(Long parentId) {
 		this.parentId = parentId;
 	}
 
-	public String getActusl() {
+	public Boolean isActusl() {
 		return actusl;
 	}
 
-	public void setActusl(String actusl) {
+	public void setActusl(Boolean actusl) {
 		this.actusl = actusl;
 	}
 
 	@Override
 	public int hashCode() {
-		int hash = 7;
-		hash = 29 * hash + Objects.hashCode(this.id);
-		hash = 29 * hash + Objects.hashCode(this.recCode);
-		hash = 29 * hash + Objects.hashCode(this.code);
-		hash = 29 * hash + Objects.hashCode(this.name);
-		hash = 29 * hash + Objects.hashCode(this.parentId);
-		hash = 29 * hash + Objects.hashCode(this.actusl);
-		return hash;
+		return Objects.hash(this.id,
+			this.recCode,
+			this.code,
+			this.name,
+			this.parentId,
+			this.actusl);
 	}
 
 	@Override
@@ -95,22 +93,22 @@ public class Mkb10 {
 			return false;
 		}
 		final Mkb10 other = (Mkb10) obj;
-		if (!Objects.equals(this.id, other.id)) {
+		if (!Objects.equals(this.recCode, other.getRecCode())) {
 			return false;
 		}
-		if (!Objects.equals(this.recCode, other.recCode)) {
+		if (!Objects.equals(this.code, other.getCode())) {
 			return false;
 		}
-		if (!Objects.equals(this.code, other.code)) {
+		if (!Objects.equals(this.name, other.getName())) {
 			return false;
 		}
-		if (!Objects.equals(this.name, other.name)) {
+		if (!Objects.equals(this.id, other.getId())) {
 			return false;
 		}
-		if (!Objects.equals(this.parentId, other.parentId)) {
+		if (!Objects.equals(this.parentId, other.getParentId())) {
 			return false;
 		}
-		return Objects.equals(this.actusl, other.actusl);
+		return Objects.equals(this.actusl, other.isActusl());
 	}
 
 	@Override

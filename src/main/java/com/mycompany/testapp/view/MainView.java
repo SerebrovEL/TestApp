@@ -126,16 +126,22 @@ public class MainView extends HorizontalLayout {
 		});
 	}
 
-	private final BiFunction<String, String, Boolean> matchesTermRecCode =
-		(value, searchTerm) -> value.toLowerCase().indexOf(searchTerm.toLowerCase()) == 0;
+	private final BiFunction<String, String, Boolean> matchesTermRecCode
+		= (value, searchTerm) -> value.toLowerCase().indexOf(searchTerm.toLowerCase()) == 0;
 
-	private final BiFunction<String, String, Boolean> matchesTerm =
-		(value, searchTerm) -> value.toLowerCase().contains(searchTerm.toLowerCase());
+	private final BiFunction<String, String, Boolean> matchesTerm
+		= (value, searchTerm) -> value.toLowerCase().contains(searchTerm.toLowerCase());
 
-	private final BiFunction<Mkb10, String, Boolean> matchTerm = (elem, terms) -> matchesTerm.apply(elem.getId(), terms)
-		||  matchesTerm.apply(elem.getCode(), terms)
-		||  matchesTerm.apply(elem.getName(), terms)
-		||  matchesTerm.apply(elem.getParentId(), terms);
+	private final BiFunction<Long, String, Boolean> matchesTermLong
+		= (value, searchTerm) -> value != null
+			? value.equals(Long.valueOf(searchTerm))
+			: Boolean.FALSE;
+
+	private final BiFunction<Mkb10, String, Boolean> matchTerm = (elem, terms)
+		-> matchesTermLong.apply(elem.getId(), terms)
+		|| matchesTerm.apply(elem.getCode(), terms)
+		|| matchesTerm.apply(elem.getName(), terms)
+		|| matchesTermLong.apply(elem.getParentId(), terms);
 
 	private final BiFunction<Mkb10, Mkb10, Boolean> matchTermTree = (elem, sTreeElem)
 		-> matchesTermRecCode.apply(elem.getRecCode(), sTreeElem.getRecCode());
